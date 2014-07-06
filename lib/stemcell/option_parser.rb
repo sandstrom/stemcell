@@ -341,7 +341,7 @@ module Stemcell
 
               # optional. notice the to_i on iops parameter
               mapping[:ebs][:volume_type] = devparam[3] unless (devparam[3].nil? || devparam[3].empty?)
-              mapping[:ebs][:iops] = devparam[4].to_i if (devparam[4].nil? || devparam[4].empty?)
+              mapping[:ebs][:iops] = devparam[4].to_i unless (devparam[4].nil? || devparam[4].empty?)
 
             end
           end
