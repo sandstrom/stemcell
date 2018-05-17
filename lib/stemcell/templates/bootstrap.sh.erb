@@ -156,7 +156,12 @@ ssl_verify_mode :verify_peer
 log_level :info
 log_location STDOUT
 
-Ohai::Config[:plugin_path] << "#{repo_dir}/ohai_plugins"
+if Module.const_defined?('Ohai::Config')
+  # https://docs.chef.io/deprecations_ohai_legacy_config.html
+  Ohai::Config[:plugin_path] << "#{repo_dir}/ohai_plugins"
+else # chef 13 and later
+  ohai.plugin_path << "#{repo_dir}/ohai_plugins"
+end
 EOF
 
   if [ -n "$encrypted_data_bag_secret_path" ]; then
