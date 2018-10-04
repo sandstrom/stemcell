@@ -49,7 +49,10 @@ domain_name='<%= opts['instance_domain_name'] %>'
 chef_version='<%= opts['chef_version'] %>'
 username='<%= opts.fetch('user', ENV['USER']) %>'
 encrypted_data_bag_secret_path='<%= opts['chef_data_bag_secret_path'].to_s %>'
-node_json='<%= opts['node_json'] %>'
+node_json=$(cat <<'EOF'
+<%= opts['node_json'] %>
+EOF
+)
 
 ##
 ## common functions
@@ -232,11 +235,8 @@ GIT_SSH=${git_wrapper} git fetch
 git reset --hard origin/\${branch}
 git clean -fdx
 
-base_json="{\"role\": \"\${role}\", \"env\": \"\${env}\", \"branch\": \"\${branch}\"}"
-json=\`echo \$node_json \$base_json | jq -s '.[0] + .[1]'\`
-
 json_file=\`mktemp\`
-echo \$json > \$json_file
+echo \$node_json > \$json_file
 trap "{ rm -f '\$json_file' ; }" EXIT
 
 echo "running chef-solo with runlist \$runlist and json \$json (in file \$json_file)"
@@ -325,7 +325,6 @@ echo "starting chef bootstrapping on ${OS_VERSION}..."
 update
 install curl
 install git
-install jq
 set_hostname
 install_chef
 create_ohai_hint

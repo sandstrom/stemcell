@@ -182,13 +182,21 @@ module Stemcell
         end
       end
 
-      if opts['node_json'].is_a?(Hash)
-        opts['node_json'] = JSON.generate(opts['node_json'])
+      unless opts['node_json'].is_a?(Hash) || opts['node_json'].nil?
+        raise '`node_json` must be a hash or nil'
       end
 
-      unless opts['node_json'].is_a?(String)
-        opts['node_json'] = '{}'
+      if opts['node_json'].nil?
+        opts['node_json'] = {}
       end
+
+      opts['node_json'].merge!({
+        'role' => opts['chef_role'],
+        'environment' => opts['chef_environment'],
+        'branch' => opts['git_branch'],
+      })
+
+      opts['node_json'] = JSON.generate(opts['node_json'])
 
       # generate user data script to bootstrap instance, include in launch
       # options UNLESS we have manually set the user-data (ie. for ec2admin)
